@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Stryque</title>
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        canvas {
+            border: 2px solid white;
+            background-color: #222;
+        }
+
+        #game-over {
+            position: absolute;
+            color: white;
+            font-size: 32px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<div id="game-over"></div>
+
+<script>
+// Configurações do Canvas e contexto de desenho
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// Variáveis de jogadores
+const jogador1 = { x: 100, y: 400, width: 50, height: 100, color: "red", vida: 100 };
+const jogador2 = { x: 650, y: 400, width: 50, height: 100, color: "blue", vida: 100 };
+
+// Controladores de movimentação
+const velocidade = 5;
+let teclaPressionada = {};
+
+// Função para desenhar os jogadores
+function desenharJogadores() {
+    ctx.fillStyle = jogador1.color;
+    ctx.fillRect(jogador1.x, jogador1.y, jogador1.width, jogador1.height);
+
+    ctx.fillStyle = jogador2.color;
+    ctx.fillRect(jogador2.x, jogador2.y, jogador2.width, jogador2.height);
+}
+
+// Função para desenhar a barra de vida
+function desenharVida() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(10, 10, 200, 20);
+    ctx.fillStyle = "red";
+    ctx.fillRect(10, 10, jogador1.vida * 2, 20);
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(590, 10, 200, 20);
+    ctx.fillStyle = "blue";
+    ctx.fillRect(590, 10, jogador2.vida * 2, 20);
+}
+
+// Função para verificar colisão
+function colisao(jogador1, jogador2) {
+    return jogador1.x < jogador2.x + jogador2.width &&
+           jogador1.x + jogador1.width > jogador2.x &&
+           jogador1.y < jogador2.y + jogador2.height &&
+           jogador1.y + jogador1.height > jogador2.y;
+}
+
+// Função para atualizar o jogo
+function atualizar() {
+    // Movimentos
+    if (teclaPressionada["a"]) jogador1.x -= velocidade;
+    if (teclaPressionada["d"]) jogador1.x += velocidade;
+    if (teclaPressionada["w"]) jogador1.y -= velocidade;
+    if (teclaPressionada["s"]) jogador1.y += velocidade;
+
+    if (teclaPressionada["ArrowLeft"]) jogador2.x -= velocidade;
+    if (teclaPressionada["ArrowRight"]) jogador2.x += velocidade;
+    if (teclaPressionada["ArrowUp"]) jogador2.y -= velocidade;
+    if (teclaPressionada["ArrowDown"]) jogador2.y += velocidade;
+
+    // Ataques
+    if (teclaPressionada[" "] && colisao(jogador1, jogador2)) {
+        jogador2.vida -= 10;
+    }
+    if (teclaPressionada["Enter"] && colisao(jogador2, jogador1)) {
+        jogador1.vida -= 10;
+    }
+
+    // Verifica se algum jogador perdeu
+    if (jogador1.vida <= 0 || jogador2.vida <= 0) {
+        document.getElementById("game-over").innerText = jogador1.vida <= 0 ? "Jogador 2 Venceu!" : "Jogador 1 Venceu!";
+        clearInterval(intervaloJogo);
+    }
+
+    // Limite de movimento dentro da tela
+    jogador1.x = Math.max(0, Math.min(jogador1.x, canvas.width - jogador1.width));
+    jogador1.y = Math.max(0, Math.min(jogador1.y, canvas.height - jogador1.height));
+    jogador2.x = Math.max(0, Math.min(jogador2.x, canvas.width - jogador2.width));
+    jogador2.y = Math.max(0, Math.min(jogador2.y, canvas.height - jogador2.height));
+
+    // Limpar tela e desenhar tudo
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    desenharJogadores();
+    desenharVida();
+}
+
+// Configuração do controle das teclas
+document.addEventListener("keydown", (e) => {
+    teclaPressionada[e.key] = true;
+});
+document.addEventListener("keyup", (e) => {
+    teclaPressionada[e.key] = false;
+});
+
+// Iniciar o jogo
+const intervaloJogo = setInterval(atualizar, 1000 / 60); // 60 FPS
+
+</script>
+</body>
+</html>
