@@ -1,0 +1,27 @@
+/* Estilo para o corpo da página */
+body {
+    background-color: #000;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+/* Estilo para o canvas onde o jogo será exibido */
+canvas {
+    border: 2px solid white;
+    background-color: #222;
+}
+
+/* Estilo para a mensagem de fim de jogo */
+#game-over {
+    position: absolute;
+    color: white;
+    font-size: 32px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    z-index: 10;
+}
